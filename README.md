@@ -40,6 +40,18 @@ Build di verifica:
 npm run build
 ```
 
+## Pubblicazione Online
+
+Il repository e configurato per GitHub Pages tramite GitHub Actions.
+
+URL previsto di pubblicazione:
+
+```text
+https://marcotranquilli.github.io/DOSheet-Quest/
+```
+
+Il deploy parte automaticamente a ogni push su `main` e sul branch di lavoro configurato.
+
 ## Script
 
 - `npm run dev` avvia il frontend in sviluppo
