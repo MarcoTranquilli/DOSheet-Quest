@@ -1,8 +1,15 @@
 import { sampleQuests } from '../data/sampleQuests';
 import { computeLevel } from './score';
-import type { QuestBoardState, QuestFocus, QuestItem, QuestPriority } from '../types';
+import type {
+  MissionLabSessionState,
+  QuestActivityEntry,
+  QuestBoardState,
+  QuestFocus,
+  QuestItem,
+  QuestPriority,
+} from '../types';
 
-const STORAGE_KEY = 'dosheet-quest:v2';
+const STORAGE_KEY = 'dosheet-quest:v4';
 
 const fallbackState: QuestBoardState = {
   quests: sampleQuests,
@@ -11,6 +18,8 @@ const fallbackState: QuestBoardState = {
     totalXp: 0,
     level: 1,
   },
+  activityLog: [],
+  missionLabState: {},
 };
 
 const validFocuses: QuestFocus[] = ['build', 'ops', 'admin', 'learning', 'personal'];
@@ -35,6 +44,44 @@ function normalizeQuest(item: Partial<QuestItem>, index: number): QuestItem {
     xp: Number(item.xp ?? 30),
     completed: Boolean(item.completed),
     createdAt: typeof item.createdAt === 'string' ? item.createdAt : new Date().toISOString(),
+    platform: item.platform === 'excel' || item.platform === 'sheets' || item.platform === 'both'
+      ? item.platform
+      : undefined,
+    domain: item.domain === 'foundations' || item.domain === 'formulas' || item.domain === 'analysis' || item.domain === 'visualization' || item.domain === 'automation'
+      ? item.domain
+      : undefined,
+    theorySnippet: typeof item.theorySnippet === 'string' ? item.theorySnippet : undefined,
+    practiceHint: typeof item.practiceHint === 'string' ? item.practiceHint : undefined,
+  };
+}
+
+function normalizeActivity(item: Partial<QuestActivityEntry>, index: number): QuestActivityEntry {
+  return {
+    id: item.id || `activity-${index + 1}`,
+    questId: String(item.questId || `quest-${index + 1}`),
+    questTitle: String(item.questTitle || 'Quest completata'),
+    xpGained: Number(item.xpGained ?? 0),
+    focus: validFocuses.includes(item.focus as QuestFocus) ? (item.focus as QuestFocus) : 'ops',
+    difficulty: item.difficulty === 'light' || item.difficulty === 'core' || item.difficulty === 'boss'
+      ? item.difficulty
+      : 'core',
+    cadence: item.cadence === 'daily' || item.cadence === 'weekly' || item.cadence === 'backlog'
+      ? item.cadence
+      : 'backlog',
+    completedAt: typeof item.completedAt === 'string' ? item.completedAt : new Date().toISOString(),
+    levelAfter: Number(item.levelAfter ?? 1),
+    wasLevelUp: Boolean(item.wasLevelUp),
+  };
+}
+
+function normalizeMissionLabState(item: Partial<MissionLabSessionState>): MissionLabSessionState {
+  return {
+    cells: typeof item.cells === 'object' && item.cells !== null ? Object.fromEntries(
+      Object.entries(item.cells).map(([key, value]) => [key, String(value)]),
+    ) : {},
+    hintTier: item.hintTier === 1 || item.hintTier === 2 ? item.hintTier : 0,
+    startedAt: Number(item.startedAt ?? Date.now()),
+    elapsedSeconds: Number(item.elapsedSeconds ?? 0),
   };
 }
 
@@ -59,6 +106,14 @@ export function loadBoardState(): QuestBoardState {
         totalXp: Number(parsed.profile?.totalXp ?? 0),
         level: computeLevel(Number(parsed.profile?.totalXp ?? 0)),
       },
+      activityLog: Array.isArray(parsed.activityLog)
+        ? parsed.activityLog.map((item, index) => normalizeActivity(item, index)).slice(0, 10)
+        : [],
+      missionLabState: typeof parsed.missionLabState === 'object' && parsed.missionLabState !== null
+        ? Object.fromEntries(
+          Object.entries(parsed.missionLabState).map(([questId, session]) => [questId, normalizeMissionLabState(session)]),
+        )
+        : {},
     };
   } catch {
     return fallbackState;
@@ -96,5 +151,13 @@ export function importBoardState(raw: string): QuestBoardState {
       totalXp: Number(parsed.profile?.totalXp ?? 0),
       level: computeLevel(Number(parsed.profile?.totalXp ?? 0)),
     },
+    activityLog: Array.isArray(parsed.activityLog)
+      ? parsed.activityLog.map((item, index) => normalizeActivity(item, index)).slice(0, 10)
+      : [],
+    missionLabState: typeof parsed.missionLabState === 'object' && parsed.missionLabState !== null
+      ? Object.fromEntries(
+        Object.entries(parsed.missionLabState).map(([questId, session]) => [questId, normalizeMissionLabState(session)]),
+      )
+      : {},
   };
 }

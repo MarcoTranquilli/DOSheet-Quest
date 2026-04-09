@@ -24,6 +24,10 @@ export function computeBoardMetrics(quests: QuestItem[]) {
   };
 }
 
+export function getQuestById(quests: QuestItem[], questId: string): QuestItem | undefined {
+  return quests.find((quest) => quest.id === questId);
+}
+
 export function completeQuest(state: QuestBoardState, questId: string): QuestBoardState {
   let gainedXp = 0;
 
@@ -49,6 +53,8 @@ export function completeQuest(state: QuestBoardState, questId: string): QuestBoa
       level: computeLevel(totalXp),
       streakDays: gainedXp > 0 ? state.profile.streakDays + 1 : state.profile.streakDays,
     },
+    activityLog: state.activityLog,
+    missionLabState: state.missionLabState,
   };
 }
 
@@ -77,5 +83,7 @@ export function reopenQuest(state: QuestBoardState, questId: string): QuestBoard
       level: computeLevel(totalXp),
       streakDays: removedXp > 0 ? Math.max(0, state.profile.streakDays - 1) : state.profile.streakDays,
     },
+    activityLog: state.activityLog,
+    missionLabState: state.missionLabState,
   };
 }

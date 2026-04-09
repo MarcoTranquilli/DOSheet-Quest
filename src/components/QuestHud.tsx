@@ -18,17 +18,17 @@ export function QuestHud({ profile, quests }: QuestHudProps) {
       <article className="panel hero-card">
         <div className="hero-layout">
           <div className="hero-copy">
-            <span className="eyebrow">Guild Expedition</span>
+            <span className="eyebrow">Spreadsheet Academy</span>
             <h1>DOSheet Quest</h1>
             <p>
-              Pianificazione operativa con linguaggio da spedizione: meno rumore, piu gerarchia,
-              progressione leggibile e una rotta chiara verso la prossima consegna.
+              Una piattaforma di apprendimento per Excel e Google Sheets: missioni brevi, teoria essenziale,
+              pratica guidata e progressione visibile verso skill davvero utili nel lavoro quotidiano.
             </p>
 
             <div className="hero-actions">
               <div className="hero-chip">
                 <span className="hero-chip-dot" />
-                320x568 ready
+                Excel + Sheets ready
               </div>
               <div className="hero-chip">
                 <span className="hero-chip-dot is-accent" />
@@ -45,6 +45,21 @@ export function QuestHud({ profile, quests }: QuestHudProps) {
                 <div className="level-progress-fill" style={{ width: `${progressToNextLevel}%` }} />
               </div>
               <small>{nextLevelXp - currentLevelProgress} XP al prossimo rank</small>
+            </div>
+
+            <div className="hero-highlight-grid">
+              <div className="hero-highlight">
+                <strong>Learn by doing</strong>
+                <small>Missioni brevi con teoria sprint, pratica guidata e feedback immediato.</small>
+              </div>
+              <div className="hero-highlight">
+                <strong>Mobile readable</strong>
+                <small>Gerarchia e contrasto pensati per leggere tutto bene anche su 320x568.</small>
+              </div>
+              <div className="hero-highlight">
+                <strong>Asset-light</strong>
+                <small>Pattern, glow e motion gestiti con CSS e SVG per restare leggeri e fluidi.</small>
+              </div>
             </div>
           </div>
 
