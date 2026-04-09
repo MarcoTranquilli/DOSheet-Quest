@@ -2,119 +2,121 @@
 
 Assunzioni adottate per sostituire i placeholder:
 
-- `design_tokens`: palette e token definiti in CSS custom properties nel file `src/styles.css`
-- `theme`: guild expedition per task planning e progressione personale
+- `design_tokens`: palette, spacing, radius, typography, elevation e iconografia documentati qui e implementati in `src/styles.css`
+- `theme`: spreadsheet academy
 - `style`: minimal
 - `primary_device`: mobile
-- `accessibility_requirements`: contrasto minimo 4.5:1, font minimo 14px su mobile, touch target minimo 44px
+- `accessibility_requirements`: contrasto minimo 4.5:1 per testo, font minimo 14px su mobile, target touch minimo 44px, variante ad alto contrasto via media query
 
 ## Analisi
 
 ### Problema 1
 
-La UI iniziale comunicava poco la gerarchia tra stato generale, missioni urgenti e azioni disponibili. Questo aumentava il tempo necessario per capire cosa fare per primo, soprattutto in una sessione rapida da mobile.
+La direzione visiva precedente era efficace come dashboard gamificata, ma parlava piu di "quest board" che di apprendimento dei fogli di calcolo. L'impatto era una promessa di prodotto meno chiara: engagement alto, ma trasferimento di competenza percepito in modo meno immediato.
 
 ### Problema 2
 
-Il linguaggio visivo era coerente a meta, ma non ancora abbastanza sistemico: colori, superfici e componenti non esprimevano un design system pienamente riconoscibile. L'impatto era una percezione da MVP tecnico piu che da piattaforma di prodotto.
+Su mobile la gerarchia tra teoria, missione, progressione e filtri era leggibile ma ancora densa. Questo aumentava il tempo per capire dove iniziare una sessione rapida e rischiava di disperdere l'attenzione.
 
 ### Problema 3
 
-Mancavano segnali di onboarding e progressione narrativa utili a sostenere il tema gamificato senza cadere nel superfluo. Questo riduceva engagement e chiarezza sul perche di XP, livelli e leaderboard.
+La UI aveva buoni accenti e motion, ma mancava una grammatica visiva piu vicina al mondo spreadsheet: griglia, dati, riepiloghi, moduli di skill. L'impatto era una minore coerenza tra estetica e promessa didattica.
 
 ## Varianti
 
 ### Variante A
 
-Titolo: Expedition Control
+Titolo: Analyst Deck
 
 Motivazioni:
 
-- privilegia chiarezza operativa e forte gerarchia informativa
-- integra la gamification come supporto, non come distrazione
+- porta la UI verso un look SaaS da piattaforma di formazione professionale
+- massimizza leggibilita e fiducia su contenuti densi
 
 Mockup mobile:
 
-- hero compatta, progress bar, CTA e tre step onboarding sopra la mission sheet
+- header compatto, card onboarding, theory sprint, board ridotta in stack verticale
 
 Mockup desktop:
 
-- hero editoriale a sinistra, avatar e metriche a destra, board principale con sidebar decisionale
+- hero con value proposition, progress panel a destra, board principale e colonna laterale accademica
 
 ### Variante B
 
-Titolo: Tactical Console
+Titolo: Spreadsheet Academy
 
 Motivazioni:
 
-- look piu tecnico e data dense, adatto a utenti power
-- forte enfasi su filtri, ranking e quick actions
+- combina linguaggio visivo data-centric e progressione gamificata senza eccessi
+- e la variante piu equilibrata tra accessibilita, identita e fattibilita tecnica
 
 Mockup mobile:
 
-- header denso, tab segmentati, cards piu compatte con tag funzionali
+- hero sintetica, 3 highlight card, filtri incapsulati, mission list leggibile con badge e theory subito sotto
 
 Mockup desktop:
 
-- dashboard tipo console con pannelli multipli e mini chart
+- hero a due colonne con avatar, stat card lineari, board a sinistra e learning stack a destra
 
 ### Variante C
 
-Titolo: Camp Journal
+Titolo: Terminal Mentor
 
 Motivazioni:
 
-- approccio piu caldo e narrativo, ideale per uso personale quotidiano
-- riduce stress percepito e migliora adozione di routine
+- accentua il lato tecnico e hacker del prodotto
+- funziona bene per utenti esperti e contesti "challenge"
 
 Mockup mobile:
 
-- card morbide, checklist piu grandi, enfasi su streak e rituali
+- interfaccia piu mono, contrasto forte, chip compatti, motion ridotto
 
 Mockup desktop:
 
-- layout magazine con board piu ariosa e pannello diario
+- pannelli scuri ad alta densita, visuale console, piu enfasi su log e activity feed
 
 ## Scelta Raccomandata
 
-Variante scelta: A, `Expedition Control`.
+Variante scelta: B, `Spreadsheet Academy`.
 
 Motivi:
 
-- bilancia meglio usabilita, tono prodotto e fattibilita tecnica
-- scala bene da mobile a desktop senza richiedere asset pesanti o logiche UI complesse
+- e la piu coerente con l'obiettivo di insegnare fogli di calcolo, non solo motivare
+- scala bene da mobile a desktop
+- mantiene una forte identita senza pagare un costo eccessivo in complessita o peso asset
 
-## Design Tokens
+## Specifica Variante Scelta
 
 ### Palette HEX
 
-- `--color-bg-canvas`: `#0F1218`
-- `--color-bg-surface`: `#171D26`
-- `--color-bg-elevated`: `#1F2733`
-- `--color-line`: `#2A3342`
-- `--color-ink-strong`: `#F6F3EA`
-- `--color-ink-soft`: `#C6C2B7`
-- `--color-ink-muted`: `#969183`
-- `--color-accent-sun`: `#F2A65A`
-- `--color-accent-coral`: `#EF6F5E`
-- `--color-accent-mint`: `#68C3A3`
-- `--color-accent-sky`: `#73B7FF`
-- `--color-accent-gold`: `#F1CF78`
+- `--color-bg-canvas`: `#0D1320`
+- `--color-bg-surface`: `#141C2B`
+- `--color-bg-elevated`: `#1B2537`
+- `--color-line`: `#334157`
+- `--color-ink-strong`: `#F7F9FC`
+- `--color-ink-soft`: `#D3DAE7`
+- `--color-ink-muted`: `#AAB4C8`
+- `--color-accent-sky`: `#6CBCFF`
+- `--color-accent-mint`: `#46D9A6`
+- `--color-accent-sun`: `#FFB648`
+- `--color-accent-coral`: `#FF6B6B`
+- `--color-accent-gold`: `#F3D27A`
 
 ### Tipografia
 
 Font:
 
-- Heading/UI: `"Avenir Next", "Segoe UI", sans-serif`
+- display: `"Avenir Next", "Segoe UI", sans-serif`
+- body: `"Avenir Next", "Segoe UI", sans-serif`
 
 Scala:
 
-- Display: `clamp(2.25rem, 5vw, 4.7rem)`
-- H1 mobile compatto: `2rem`
-- H2: `1.375rem`
-- Body base: `1rem`
-- Body small: `0.875rem`
-- Eyebrow: `0.75rem`
+- display hero: `clamp(2.25rem, 5vw, 4.7rem)`
+- title panel: `1.375rem`
+- stat number: `clamp(1.8rem, 4vw, 3.2rem)`
+- body: `1rem`
+- body small: `0.875rem`
+- eyebrow: `0.75rem`
 
 ### Spacing token
 
@@ -135,86 +137,117 @@ Scala:
 
 - `shadow-soft`: `0 12px 32px rgba(0,0,0,0.22)`
 - `shadow-panel`: `0 24px 64px rgba(5,7,10,0.36)`
+- `shadow-glow`: `0 0 0 1px rgba(115,183,255,0.1), 0 18px 40px rgba(6,10,16,0.28)`
 
-### Sistema icone
+### Iconografia
 
-Icone consigliate:
+Set consigliato:
 
 - `icon-compass`
-- `icon-flame`
-- `icon-check-ring`
-- `icon-scroll`
-- `icon-ranking`
 - `icon-spark`
+- `icon-crown`
+- `icon-shield`
+- `icon-trail`
+- `icon-grid`
+- `icon-formula`
+- `icon-chart-bar`
 
-Formato: SVG 24x24, stroke 1.75, round caps, no raster.
+Formato:
 
-## Evoluzione Personaggio
+- SVG 24x24
+- stroke 1.75
+- round caps/joins
+- no immagini raster per UI core
+
+## Evoluzione per Livelli
 
 ### Livello 1
 
-Visual:
+Aspetto:
 
-- avatar base con `Field Badge`
-- palette prevalente `sun + sky`
-- una sola orbita sottile
+- avatar essenziale con badge base
+- superfici pulite, glow limitato
+- una sola orbita tenue
 
-Micro-animazione sbloccabile:
+Accessori:
 
-- pulse lieve del badge ogni completamento boss
+- field badge
+- chip progress semplice
+
+Micro-animazione:
+
+- pulse lieve della progress bar
+
+Regola di sblocco:
+
+- default iniziale
 
 ### Livello 3
 
-Visual:
+Aspetto:
 
-- `Scout Mantle`
-- dettagli `gold + coral`
-- doppia orbita e bordo pannello piu caldo
+- maggiore intensita di glow nei pannelli chiave
+- secondo anello avatar
+- card di activity con accent piu marcati
 
-Micro-animazione sbloccabile:
+Accessori:
 
-- sweep luminoso rapido sulla progress bar
+- scout mantle
+- segmented progress ring
+
+Micro-animazione:
+
+- orbit lenta avatar
+- rise piu evidente nel floating XP
+
+Regola di sblocco:
+
+- `>= 200 XP`
 
 ### Livello 5
 
-Visual:
+Aspetto:
 
-- `Compass Crown`
-- aura `mint`
-- alone piu ampio, particelle SVG leggere o bagliore CSS
+- massimo contrasto locale su hero e summary strip
+- aura mint sull'avatar
+- leaderboard row self piu distintiva
 
-Micro-animazione sbloccabile:
+Accessori:
 
-- orbita lenta permanente, disattivata con `prefers-reduced-motion`
+- compass crown
+- aura trail
 
-Regole di sblocco:
+Micro-animazione:
 
-- livello 1: default
-- livello 3: `>= 200 XP`
-- livello 5: `>= 400 XP`
+- ring dinamico del level-up overlay
+- accento luminoso su activity log
+
+Regola di sblocco:
+
+- `>= 400 XP`
 
 ## Micro-animazioni
 
-### Orbit Spin
+### Floating XP
 
-- durata: `12s` e `16s`
+- durata: `2200ms`
+- easing: `ease`
+- trigger: completamento quest
+- fallback: toast statico senza movimento
+
+### Orbit Ring
+
+- durata: `11s` e `16s`
 - easing: `linear`
-- trigger: avatar visibile
-- fallback: orbite statiche
+- trigger: avatar o level-up card in viewport
+- fallback: anelli statici
 
-### Level Fill
+### Progress Fill
 
 - durata: `220ms`
 - easing: `ease-out`
 - trigger: aggiornamento XP
 - fallback: width aggiornata senza transizione
-
-### Hover Lift
-
-- durata: `140ms`
-- easing: `ease`
-- trigger: hover/focus su button e template card
-- fallback: nessun sollevamento, solo cambio colore
 
 ## Wireframe Annotati
 
@@ -222,93 +255,123 @@ Regole di sblocco:
 
 Elementi:
 
-- hero title `16px top padding`, priorita alta
-- progress bar full width, `12px` height, priorita alta
-- 3 step card verticali, gap `10px`, priorita alta
-- CTA template rapidi sotto fold corto, priorita media
+- hero compatta con titolo e 2 chip, priorita alta
+- 3 step verticali, gap `10-12px`, priorita alta
+- theory sprint subito dopo, priorita alta
+- template card sotto fold, priorita media
+
+Misure:
+
+- padding page `16px`
+- panel padding `16px`
+- target tap `44px`
 
 Note UX:
 
-- prima schermata deve spiegare subito il modello mentale
-- una sola azione primaria visibile per evitare overload
+- spiegare "imparo con missioni brevi" nei primi 5 secondi
+- mostrare teoria e pratica prima di leaderboard o metriche secondarie
 
 ### Dashboard Desktop
 
 Elementi:
 
-- hero left `60%`, avatar right `40%`, gap `20px`, priorita alta
-- stat cards in row da 4, gap `16px`, priorita alta
-- mission board principale a sinistra, sidebar a destra, priorita alta
-- filtri in singola riga finche lo spazio lo permette, priorita media
+- hero 60/40 con avatar e highlights
+- stat cards in row da 4
+- mission board a sinistra
+- theory sprint, tracks, activity e leaderboard in colonna destra
+
+Misure:
+
+- max width `1320px`
+- gap principali `16px`
+- panel padding `20px`
 
 Note UX:
 
-- board e sidebar devono essere leggibili anche a 1280px senza scroll orizzontale
-- le quest urgenti devono emergere in meno di 2 secondi
+- priorita alla missione attuale e al prossimo passo formativo
+- rendere subito visibile quale skill si sta allenando
 
 ### Leaderboard
 
 Elementi:
 
-- top 3 rows in lista verticale, padding `12x14`
+- top rows in lista verticale
 - rank badge `32x32`
-- XP e livello allineati a destra su desktop, sotto su mobile
+- XP e livello allineati a destra desktop, sotto su mobile
+
+Misure:
+
+- row padding `12x14`
+- spacing interno `12px`
 
 Note UX:
 
-- leaderboard deve essere motivazionale, non competitiva in modo tossico
-- nessun elemento pay to win o premio aggressivo
+- tono collaborativo, non aggressivo
+- niente segnali pay-to-win o dominance tossica
 
 ## Brief Tecnico
-
-Mini design system interno ora presente nel codice:
-
-- `ActionButton`
-- `PanelCard`
-- `SectionHeading`
-- `EmptyState`
 
 ### Layer naming
 
 - `bg/canvas`
-- `bg/surface/panel`
+- `bg/hero-grid`
 - `hero/title`
-- `hero/progress-track`
-- `hero/progress-fill`
-- `avatar/core`
-- `avatar/orbit/a`
-- `avatar/orbit/b`
-- `board/filter/search`
+- `hero/highlight/learn`
+- `hero/highlight/mobile`
+- `hero/highlight/performance`
+- `board/filter-shell`
+- `board/session-focus`
+- `board/session-focus-side`
+- `board/summary-strip`
 - `board/row/default`
 - `board/row/completed`
-- `leaderboard/row/self`
+- `activity/row`
+- `onboarding/banner`
+- `onboarding/outcome-a`
+- `onboarding/outcome-b`
+- `leaderboard/banner`
+- `theory/card`
+- `avatar/ring/a`
+- `avatar/ring/b`
 
 ### Asset naming
 
-- `icon-compass-24.svg`
-- `icon-ranking-24.svg`
-- `avatar-badge-field.svg`
-- `avatar-badge-mantle.svg`
-- `avatar-badge-crown.svg`
+- `icon-grid-24.svg`
+- `icon-formula-24.svg`
+- `icon-chart-bar-24.svg`
+- `avatar-badge-field-64.svg`
+- `avatar-badge-mantle-64.svg`
+- `avatar-badge-crown-64.svg`
+
+### Export specs
+
+- mockup desktop: `1440x1024`, `mockup-dashboard-desktop-spreadsheet-academy.png`
+- mockup mobile: `390x844`, `mockup-onboarding-mobile-spreadsheet-academy.png`
+- leaderboard: `1280x960`, `mockup-leaderboard-spreadsheet-academy.png`
+- avatar compact: `64x64`, `avatar-rank-lv1-64.png`, `avatar-rank-lv3-64.png`, `avatar-rank-lv5-64.png`
+- icon simplified: `24x24`, `icon-grid-simplified-24.svg`
 
 ### CSS/SVG pseudocode
 
 ```css
+.hero-card {
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(145deg, #141c2b, #0d1320);
+}
+
 .level-progress-fill {
-  background: linear-gradient(90deg, #f2a65a, #ef6f5e);
+  background: linear-gradient(90deg, #6cbcff, #46d9a6, #ffb648);
   transition: width 220ms ease-out;
 }
 
-.avatar-orbit {
-  border: 1px dashed rgba(255,255,255,.14);
-  animation: orbit-spin 12s linear infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .avatar-orbit,
-  .level-progress-fill {
-    animation: none;
+  .level-progress-fill,
+  .avatar-orbit-a,
+  .avatar-orbit-b {
     transition: none;
+    animation: none;
   }
 }
 ```
@@ -321,91 +384,47 @@ Mini design system interno ora presente nel codice:
 
 ### Performance
 
-- preferire SVG inline o sprite sheet SVG per icone e badge
-- evitare PNG per elementi UI geometrici
-- obiettivo peso icone totale `< 25 KB gzip`
-- eventuali illustrazioni future: WebP, max `120 KB` mobile hero
-- lazy loading per asset non above-the-fold
-- nessuna libreria di animazione esterna se CSS copre il caso
+- preferire SVG inline o sprite sheet per icone
+- niente bitmap per decorazioni di pannello
+- usare gradienti CSS e pattern leggeri
+- obiettivo asset UI custom `< 30 KB gzip`
+- lazy load solo per eventuali illustrazioni future, non per icone core
 
-## Iterazioni Automatiche
+## Changelog Grafico
 
-### Iterazione 1
+- `Must` Riallineare il tema da quest-board a spreadsheet academy. Complessita: media.
+- `Must` Rafforzare contrasto e leggibilita mobile. Complessita: bassa.
+- `Must` Rendere hero, tracks e theory piu coerenti con il contesto spreadsheet. Complessita: media.
+- `Should` Introdurre icone dedicate a grid, formulas e analytics. Complessita: media.
+- `Should` Distinguere visivamente domain e platform in tutte le missioni. Complessita: media.
+- `Should` Mettere in evidenza la missione consigliata dentro la board con theory e practice prompt. Complessita: bassa.
+- `Should` Spostare la leaderboard verso un confronto collaborativo con streak e delta settimanali. Complessita: bassa.
+- `Should` Aggiungere mockup statici o screenshot guidati in docs. Complessita: bassa.
+- `NiceToHave` Tema secondario corporate chiaro per contesti enterprise. Complessita: media.
+- `NiceToHave` Illustrazioni SVG dell'avatar piu ricche per rank alti. Complessita: media.
 
-Cambiato:
-
-- ridotta la densita visiva mobile
-- aumentato il contrasto di superfici, testi e focus states
-- semplificata la gerarchia a 320x568
-
-Perche:
-
-- la prima esperienza d'uso su schermi piccoli richiede comprensione immediata e tap target piu robusti
-
-### Iterazione 2
+## Iterazione 1
 
 Cambiato:
 
-- approccio asset-light basato su CSS e SVG
-- animazioni rese fattibili senza dipendenze pesanti
-- leaderboard e avatar costruiti con forme CSS, non immagini raster
+- contrasto dei testi secondari e dei bordi aumentato
+- shell dei filtri resa piu netta
+- hero e highlights riorganizzati per lettura piu rapida a `320x568`
+- banner onboarding e outcome card aggiunti per chiarire il primo passo
+- session focus reso visibile prima dei filtri per ridurre il tempo di decisione
 
 Perche:
 
-- migliore rapporto qualita/peso, piu controllo sul rendering e meno costo di implementazione
+- migliorare onboarding e comprensione immediata su schermi piccoli
 
-### Iterazione 3
+## Iterazione 2
 
 Cambiato:
 
-- board resa piu scansionabile con summary strip, righe con accenti di priorita, meta-pill e hierarchy più forte
-- avatar e leaderboard raffinati con dettagli visivi leggeri ma piu distintivi
-- aggiunto supporto `prefers-contrast: more` per una variante ad alto contrasto
+- confermato uso prevalente di CSS gradients e SVG
+- niente immagini decorative pesanti
+- motion limitato a transform/opacity
 
 Perche:
 
-- serviva un salto di maturita grafica senza introdurre asset pesanti o complessita non sostenibile in implementazione
-
-## Export Specs
-
-### Mockup Full Screen
-
-- desktop: `1440x1024`, file `mockup-dashboard-desktop-v3.png`
-- mobile: `390x844`, file `mockup-onboarding-mobile-v3.png`
-- leaderboard: `1280x960`, file `mockup-leaderboard-v3.png`
-
-### Avatar
-
-- standard UI: `64x64`, file `avatar-rank-lv1-64.png`, `avatar-rank-lv3-64.png`, `avatar-rank-lv5-64.png`
-- source vector: `avatar-rank-master.svg`
-
-### Icona Semplificata
-
-- app/icon badge: `24x24` e `32x32`, file `icon-compass-simplified-24.svg`, `icon-compass-simplified-32.svg`
-
-### Layer Naming per Export
-
-- `bg/base`
-- `bg/glow/top-left`
-- `hero/content`
-- `hero/avatar`
-- `board/summary-strip`
-- `board/filter-row`
-- `board/quest-row/priority-now`
-- `leaderboard/row/top1`
-- `avatar/badge`
-
-## Backlog Prioritizzato
-
-- `Must` Ridisegnare la mission hero con avatar, progress bar e CTA. Complessita: media.
-- `Must` Consolidare i design token in un file dedicato o CSS variables documentate. Complessita: bassa.
-- `Must` Rafforzare la leggibilita mobile della board a `320x568`. Complessita: media.
-- `Must` Aggiungere icone SVG coerenti al sistema mission/guild. Complessita: media.
-- `Must` Implementare stati focus, hover e reduced motion accessibili. Complessita: bassa.
-- `Should` Distinguere visivamente quest `now` e `boss` con semafori non invasivi. Complessita: media.
-- `Should` Introdurre onboarding progressivo con preset iniziali. Complessita: media.
-- `Should` Rendere la leaderboard dati-driven e non statica. Complessita: media.
-- `Should` Aggiungere test visuali snapshot su breakpoint mobile e desktop. Complessita: media.
-- `NiceToHave` Aggiungere micro-celebrazione non bloccante al completamento boss. Complessita: media.
-- `NiceToHave` Preparare tema secondario light o corporate per white-label. Complessita: alta.
-- `NiceToHave` Estrarre componenti UI condivisi in un mini design system interno. Complessita: media.
+- massimizzare fluidita, tempi di caricamento e sostenibilita tecnica del design

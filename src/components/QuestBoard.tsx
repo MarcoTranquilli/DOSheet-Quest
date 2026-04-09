@@ -1,4 +1,4 @@
-import { cadenceLabels, focusLabels, priorityLabels } from '../lib/labels';
+import { cadenceLabels, domainLabels, focusLabels, platformLabels, priorityLabels } from '../lib/labels';
 import { computeBoardMetrics } from '../lib/score';
 import { QuestGlyph } from './QuestGlyph';
 import { EmptyState } from './ui/EmptyState';
@@ -10,6 +10,7 @@ interface QuestBoardProps {
   activeCadence: QuestCadence;
   onCadenceChange: (value: QuestCadence) => void;
   quests: QuestItem[];
+  spotlightQuest?: QuestItem;
   onToggleQuest: (questId: string, completed: boolean) => void;
   searchQuery: string;
   onSearchQueryChange: (value: string) => void;
@@ -25,6 +26,7 @@ export function QuestBoard({
   activeCadence,
   onCadenceChange,
   quests,
+  spotlightQuest,
   onToggleQuest,
   searchQuery,
   onSearchQueryChange,
@@ -90,6 +92,26 @@ export function QuestBoard({
           </div>
         </div>
       </div>
+
+      {spotlightQuest ? (
+        <div className="board-spotlight" aria-label="Missione consigliata">
+          <div className="board-spotlight-copy">
+            <span className="eyebrow">Session Focus</span>
+            <strong>{spotlightQuest.title}</strong>
+            <p>{spotlightQuest.theorySnippet || spotlightQuest.note}</p>
+            <div className="track-topline">
+              {spotlightQuest.platform ? <span className="meta-pill">{platformLabels[spotlightQuest.platform]}</span> : null}
+              {spotlightQuest.domain ? <span className="meta-pill">{domainLabels[spotlightQuest.domain]}</span> : null}
+              <span className={`meta-pill priority-${spotlightQuest.priority}`}>{priorityLabels[spotlightQuest.priority]}</span>
+            </div>
+          </div>
+          <div className="board-spotlight-side">
+            <span className={`pill ${spotlightQuest.difficulty}`}>{spotlightQuest.difficulty}</span>
+            <strong>{spotlightQuest.xp} XP</strong>
+            <small>{spotlightQuest.practiceHint || 'Riproduci l’esercizio in un foglio reale e verifica che il risultato sia coerente.'}</small>
+          </div>
+        </div>
+      ) : null}
 
       <div className="board-filters">
         <label>
@@ -170,6 +192,8 @@ export function QuestBoard({
                   <QuestGlyph type={quest.focus === 'build' ? 'spark' : quest.focus === 'learning' ? 'compass' : 'shield'} />
                   {focusLabels[quest.focus]}
                 </span>
+                {quest.platform ? <span className="meta-pill">{platformLabels[quest.platform]}</span> : null}
+                {quest.domain ? <span className="meta-pill">{domainLabels[quest.domain]}</span> : null}
                 <span className={`meta-pill priority-${quest.priority}`}>{priorityLabels[quest.priority]}</span>
               </span>
             </span>

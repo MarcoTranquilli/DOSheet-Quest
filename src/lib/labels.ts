@@ -1,4 +1,4 @@
-import type { QuestCadence, QuestDifficulty, QuestFocus, QuestPriority } from '../types';
+import type { QuestCadence, QuestDifficulty, QuestFocus, QuestPriority, SpreadsheetDomain, SpreadsheetPlatform } from '../types';
 
 export const cadenceLabels: Record<QuestCadence, string> = {
   daily: 'Daily',
@@ -24,4 +24,18 @@ export const priorityLabels: Record<QuestPriority, string> = {
   now: 'Now',
   next: 'Next',
   later: 'Later',
+};
+
+export const platformLabels: Record<SpreadsheetPlatform, string> = {
+  excel: 'Excel',
+  sheets: 'Google Sheets',
+  both: 'Excel + Sheets',
+};
+
+export const domainLabels: Record<SpreadsheetDomain, string> = {
+  foundations: 'Foundations',
+  formulas: 'Formulas',
+  analysis: 'Analysis',
+  visualization: 'Visualization',
+  automation: 'Automation',
 };
