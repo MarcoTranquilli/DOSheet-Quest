@@ -55,6 +55,8 @@ export function completeQuest(state: QuestBoardState, questId: string): QuestBoa
     },
     activityLog: state.activityLog,
     missionLabState: state.missionLabState,
+    missionLabProgress: state.missionLabProgress,
+    tacticalState: state.tacticalState,
   };
 }
 
@@ -85,5 +87,7 @@ export function reopenQuest(state: QuestBoardState, questId: string): QuestBoard
     },
     activityLog: state.activityLog,
     missionLabState: state.missionLabState,
+    missionLabProgress: state.missionLabProgress,
+    tacticalState: state.tacticalState,
   };
 }

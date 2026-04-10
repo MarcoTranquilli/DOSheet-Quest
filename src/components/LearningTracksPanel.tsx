@@ -14,8 +14,8 @@ export function LearningTracksPanel({ quests }: LearningTracksPanelProps) {
     <PanelCard className="notes-panel">
       <SectionHeading
         eyebrow="Learning Tracks"
-        title="Percorsi di competenza"
-        description="Missioni raggruppate per abilita reali di Excel e Google Sheets, pensate per portarti da uso base a casi professionali."
+        title="Scegli un percorso"
+        description="Ogni track raccoglie missioni simili, così puoi concentrarti su una skill alla volta."
       />
 
       <div className="track-list">

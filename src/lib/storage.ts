@@ -1,6 +1,8 @@
 import { sampleQuests } from '../data/sampleQuests';
 import { computeLevel } from './score';
+import { createInitialTacticalState } from './tactics';
 import type {
+  MissionLabProgressState,
   MissionLabSessionState,
   QuestActivityEntry,
   QuestBoardState,
@@ -9,7 +11,7 @@ import type {
   QuestPriority,
 } from '../types';
 
-const STORAGE_KEY = 'dosheet-quest:v4';
+const STORAGE_KEY = 'dosheet-quest:v5';
 
 const fallbackState: QuestBoardState = {
   quests: sampleQuests,
@@ -20,6 +22,8 @@ const fallbackState: QuestBoardState = {
   },
   activityLog: [],
   missionLabState: {},
+  missionLabProgress: {},
+  tacticalState: createInitialTacticalState(),
 };
 
 const validFocuses: QuestFocus[] = ['build', 'ops', 'admin', 'learning', 'personal'];
@@ -85,6 +89,16 @@ function normalizeMissionLabState(item: Partial<MissionLabSessionState>): Missio
   };
 }
 
+function normalizeMissionLabProgress(item: Partial<MissionLabProgressState>): MissionLabProgressState {
+  return {
+    attempts: Number(item.attempts ?? 0),
+    bestMasteryScore: Number(item.bestMasteryScore ?? 0),
+    completedRuns: Number(item.completedRuns ?? 0),
+    completedWithoutHints: Boolean(item.completedWithoutHints),
+    lastCompletedAt: typeof item.lastCompletedAt === 'string' ? item.lastCompletedAt : undefined,
+  };
+}
+
 export function loadBoardState(): QuestBoardState {
   if (typeof window === 'undefined') {
     return fallbackState;
@@ -114,6 +128,19 @@ export function loadBoardState(): QuestBoardState {
           Object.entries(parsed.missionLabState).map(([questId, session]) => [questId, normalizeMissionLabState(session)]),
         )
         : {},
+      missionLabProgress: typeof parsed.missionLabProgress === 'object' && parsed.missionLabProgress !== null
+        ? Object.fromEntries(
+          Object.entries(parsed.missionLabProgress).map(([questId, progress]) => [questId, normalizeMissionLabProgress(progress)]),
+        )
+        : {},
+      tacticalState: {
+        turn: Number(parsed.tacticalState?.turn ?? 1),
+        phase: parsed.tacticalState?.phase === 'engage' || parsed.tacticalState?.phase === 'review' ? parsed.tacticalState.phase : 'command',
+        actionPoints: Number(parsed.tacticalState?.actionPoints ?? fallbackState.tacticalState.actionPoints),
+        maxActionPoints: Number(parsed.tacticalState?.maxActionPoints ?? fallbackState.tacticalState.maxActionPoints),
+        momentum: Number(parsed.tacticalState?.momentum ?? 0),
+        lastEvent: typeof parsed.tacticalState?.lastEvent === 'string' ? parsed.tacticalState.lastEvent : fallbackState.tacticalState.lastEvent,
+      },
     };
   } catch {
     return fallbackState;
@@ -159,5 +186,18 @@ export function importBoardState(raw: string): QuestBoardState {
         Object.entries(parsed.missionLabState).map(([questId, session]) => [questId, normalizeMissionLabState(session)]),
       )
       : {},
+    missionLabProgress: typeof parsed.missionLabProgress === 'object' && parsed.missionLabProgress !== null
+      ? Object.fromEntries(
+        Object.entries(parsed.missionLabProgress).map(([questId, progress]) => [questId, normalizeMissionLabProgress(progress)]),
+      )
+      : {},
+    tacticalState: {
+      turn: Number(parsed.tacticalState?.turn ?? 1),
+      phase: parsed.tacticalState?.phase === 'engage' || parsed.tacticalState?.phase === 'review' ? parsed.tacticalState.phase : 'command',
+      actionPoints: Number(parsed.tacticalState?.actionPoints ?? fallbackState.tacticalState.actionPoints),
+      maxActionPoints: Number(parsed.tacticalState?.maxActionPoints ?? fallbackState.tacticalState.maxActionPoints),
+      momentum: Number(parsed.tacticalState?.momentum ?? 0),
+      lastEvent: typeof parsed.tacticalState?.lastEvent === 'string' ? parsed.tacticalState.lastEvent : fallbackState.tacticalState.lastEvent,
+    },
   };
 }

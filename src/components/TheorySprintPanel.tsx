@@ -12,9 +12,9 @@ export function TheorySprintPanel({ quest }: TheorySprintPanelProps) {
   return (
     <PanelCard className="notes-panel">
       <SectionHeading
-        eyebrow="Theory Sprint"
-        title="Teoria associata alla prossima missione"
-        description="Una pillola didattica breve, pensata per accompagnare subito la pratica senza interrompere il flusso."
+        eyebrow="Next Step"
+        title="Prossima missione consigliata"
+        description="Leggi il concetto chiave, poi apri il lab e applicalo subito."
       />
 
       {quest ? (
@@ -25,17 +25,22 @@ export function TheorySprintPanel({ quest }: TheorySprintPanelProps) {
           </div>
           <strong>{quest.title}</strong>
           <p>{quest.theorySnippet || quest.note}</p>
+          <div className="theory-checklist" aria-label="Passi consigliati">
+            <small>1. Leggi la teoria</small>
+            <small>2. Completa il lab</small>
+            <small>3. Ripeti sul foglio reale</small>
+          </div>
           <div className="practice-box">
             <span className="meta-pill">
               <QuestGlyph type="spark" />
-              Practice Prompt
+              Prompt di pratica
             </span>
             <small>{quest.practiceHint || 'Prova a riprodurre questa quest in un foglio reale con dati semplici ma coerenti.'}</small>
           </div>
         </div>
       ) : (
         <div className="activity-empty">
-          Nessuna missione didattica aperta: completa o crea una quest di apprendimento per ottenere teoria e pratica guidata.
+          Nessuna missione didattica aperta. Crea o riapri una missione di apprendimento per ottenere teoria e pratica guidata.
         </div>
       )}
     </PanelCard>
