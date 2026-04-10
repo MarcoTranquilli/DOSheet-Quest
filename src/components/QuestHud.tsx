@@ -21,18 +21,18 @@ export function QuestHud({ profile, quests }: QuestHudProps) {
             <span className="eyebrow">Spreadsheet Academy</span>
             <h1>DOSheet Quest</h1>
             <p>
-              Una piattaforma di apprendimento per Excel e Google Sheets: missioni brevi, teoria essenziale,
-              pratica guidata e progressione visibile verso skill davvero utili nel lavoro quotidiano.
+              Impara Excel e Google Sheets con missioni pratiche, progressione chiara e una struttura a turni che ti
+              aiuta a restare focalizzato.
             </p>
 
             <div className="hero-actions">
               <div className="hero-chip">
                 <span className="hero-chip-dot" />
-                Excel + Sheets ready
+                Excel e Sheets
               </div>
               <div className="hero-chip">
                 <span className="hero-chip-dot is-accent" />
-                Contrast target 4.5:1
+                Sessioni a turni
               </div>
             </div>
 
@@ -49,16 +49,16 @@ export function QuestHud({ profile, quests }: QuestHudProps) {
 
             <div className="hero-highlight-grid">
               <div className="hero-highlight">
-                <strong>Learn by doing</strong>
-                <small>Missioni brevi con teoria sprint, pratica guidata e feedback immediato.</small>
+                <strong>Percorso chiaro</strong>
+                <small>Ogni sessione alterna pianificazione, pratica e review.</small>
               </div>
               <div className="hero-highlight">
-                <strong>Mobile readable</strong>
-                <small>Gerarchia e contrasto pensati per leggere tutto bene anche su 320x568.</small>
+                <strong>Feedback immediato</strong>
+                <small>XP, validazione e mastery score rendono visibile ogni progresso.</small>
               </div>
               <div className="hero-highlight">
-                <strong>Asset-light</strong>
-                <small>Pattern, glow e motion gestiti con CSS e SVG per restare leggeri e fluidi.</small>
+                <strong>UI leggibile</strong>
+                <small>Gerarchia e contrasto restano chiari anche su schermi piccoli.</small>
               </div>
             </div>
           </div>
@@ -82,15 +82,15 @@ export function QuestHud({ profile, quests }: QuestHudProps) {
       </article>
 
       <article className="panel stat-card">
-        <span className="eyebrow">Focus Load</span>
+        <span className="eyebrow">Urgent</span>
         <strong>{openNow}</strong>
-        <p>Quest aperte con priorita `now` che chiedono attenzione immediata.</p>
+        <p>Missioni aperte con priorita immediata nella vista corrente.</p>
       </article>
 
       <article className="panel stat-card">
-        <span className="eyebrow">Boss Queue</span>
+        <span className="eyebrow">Advanced</span>
         <strong>{bossOpen}</strong>
-        <p>Missioni ad alta intensita ancora aperte nella vista corrente.</p>
+        <p>Missioni avanzate ancora aperte nella vista corrente.</p>
       </article>
     </section>
   );

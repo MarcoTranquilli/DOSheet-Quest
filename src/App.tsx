@@ -14,23 +14,28 @@ import { QuestComposer } from './components/QuestComposer';
 import { QuestHud } from './components/QuestHud';
 import { QuestTemplates } from './components/QuestTemplates';
 import { RecentActivityPanel } from './components/RecentActivityPanel';
+import { TacticalCommandPanel } from './components/TacticalCommandPanel';
 import { TheorySprintPanel } from './components/TheorySprintPanel';
 import { ActionButton } from './components/ui/ActionButton';
 import { PanelCard } from './components/ui/PanelCard';
 import { SectionHeading } from './components/ui/SectionHeading';
 import { completeQuest, getQuestById, reopenQuest } from './lib/score';
 import { exportBoardState, importBoardState, loadBoardState, resetBoardState, saveBoardState } from './lib/storage';
-import type { QuestActivityEntry, QuestBoardState, QuestCadence, QuestFocus, QuestItem, QuestPriority } from './types';
+import { tacticalPhaseLabels } from './lib/tactics';
+import type { QuestActivityEntry, QuestBoardState, QuestCadence, QuestFocus, QuestItem, QuestPriority, TacticalPhase } from './types';
 
 export default function App() {
   const [boardState, setBoardState] = useState<QuestBoardState>(() => loadBoardState());
+  const [activeMissionQuestId, setActiveMissionQuestId] = useState<string | null>(null);
   const [activeCadence, setActiveCadence] = useState<QuestCadence>('daily');
+  const [sidebarView, setSidebarView] = useState<'learn' | 'progress' | 'tools'>('learn');
   const [searchQuery, setSearchQuery] = useState('');
   const [showCompleted, setShowCompleted] = useState(true);
   const [priorityFilter, setPriorityFilter] = useState<QuestPriority | 'all'>('all');
   const [focusFilter, setFocusFilter] = useState<QuestFocus | 'all'>('all');
   const [floatingXp, setFloatingXp] = useState<{ xp: number; questTitle: string } | null>(null);
   const [levelUpLevel, setLevelUpLevel] = useState<number | null>(null);
+  const [tacticalNotice, setTacticalNotice] = useState<string | null>(null);
 
   useEffect(() => {
     saveBoardState(boardState);
@@ -44,6 +49,15 @@ export default function App() {
     const timeoutId = window.setTimeout(() => setFloatingXp(null), 2200);
     return () => window.clearTimeout(timeoutId);
   }, [floatingXp]);
+
+  useEffect(() => {
+    if (!tacticalNotice) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setTacticalNotice(null), 2600);
+    return () => window.clearTimeout(timeoutId);
+  }, [tacticalNotice]);
 
   const filteredQuests = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
@@ -78,11 +92,47 @@ export default function App() {
     [boardState.quests],
   );
 
+  const activeMissionQuest = useMemo(() => {
+    if (activeMissionQuestId) {
+      return boardState.quests.find((quest) => quest.id === activeMissionQuestId);
+    }
+
+    return recommendedLearningQuest;
+  }, [activeMissionQuestId, boardState.quests, recommendedLearningQuest]);
+
+  const nextMissionQuest = useMemo(
+    () => boardState.quests.find((quest) => quest.focus === 'learning' && !quest.completed && quest.id !== activeMissionQuest?.id),
+    [activeMissionQuest?.id, boardState.quests],
+  );
+
+  useEffect(() => {
+    if (!activeMissionQuestId && recommendedLearningQuest) {
+      setActiveMissionQuestId(recommendedLearningQuest.id);
+      return;
+    }
+
+    if (activeMissionQuestId && !boardState.quests.some((quest) => quest.id === activeMissionQuestId)) {
+      setActiveMissionQuestId(recommendedLearningQuest?.id ?? null);
+    }
+  }, [activeMissionQuestId, boardState.quests, recommendedLearningQuest]);
+
   function handleAddQuest(quest: QuestItem) {
-    setBoardState((current) => ({
-      ...current,
-      quests: [quest, ...current.quests],
-    }));
+    if (boardState.tacticalState.actionPoints <= 0) {
+      setTacticalNotice('Nessun action point disponibile per creare nuove missioni in questo turno.');
+      return;
+    }
+
+    setBoardState((current) => {
+      return {
+        ...current,
+        quests: [quest, ...current.quests],
+        tacticalState: {
+          ...current.tacticalState,
+          actionPoints: Math.max(0, current.tacticalState.actionPoints - 1),
+          lastEvent: 'Quest forged',
+        },
+      };
+    });
   }
 
   function handleMissionLabSessionChange(questId: string, nextSessionState: QuestBoardState['missionLabState'][string]) {
@@ -107,10 +157,23 @@ export default function App() {
     });
   }
 
+  function handleMissionLabProgressUpdate(
+    questId: string,
+    updater: (current?: QuestBoardState['missionLabProgress'][string]) => QuestBoardState['missionLabProgress'][string],
+  ) {
+    setBoardState((current) => ({
+      ...current,
+      missionLabProgress: {
+        ...current.missionLabProgress,
+        [questId]: updater(current.missionLabProgress[questId]),
+      },
+    }));
+  }
+
   function completeQuestWithRewards(questId: string) {
     setBoardState((current) => {
       const targetQuest = getQuestById(current.quests, questId);
-      if (!targetQuest || targetQuest.completed) {
+      if (!targetQuest || targetQuest.completed || current.tacticalState.actionPoints <= 0) {
         return current;
       }
 
@@ -145,6 +208,13 @@ export default function App() {
         ...nextState,
         activityLog: [activityEntry, ...current.activityLog].slice(0, 8),
         missionLabState: nextMissionLabState,
+        tacticalState: {
+          ...current.tacticalState,
+          actionPoints: Math.max(0, current.tacticalState.actionPoints - 1),
+          momentum: current.tacticalState.momentum + 1,
+          lastEvent: `Objective cleared: ${targetQuest.title}`,
+          phase: 'review',
+        },
       };
     });
   }
@@ -155,7 +225,56 @@ export default function App() {
       return;
     }
 
+    if (boardState.tacticalState.actionPoints <= 0) {
+      setTacticalNotice('Nessun action point rimasto. Chiudi il turno per ripristinare la squadra.');
+      return;
+    }
+
     completeQuestWithRewards(questId);
+  }
+
+  function handlePhaseChange(phase: TacticalPhase) {
+    setBoardState((current) => ({
+      ...current,
+      tacticalState: {
+        ...current.tacticalState,
+        phase,
+        lastEvent: `Phase switched to ${tacticalPhaseLabels[phase]}`,
+      },
+    }));
+  }
+
+  function handleEndTurn() {
+    setBoardState((current) => ({
+      ...current,
+      tacticalState: {
+        ...current.tacticalState,
+        turn: current.tacticalState.turn + 1,
+        actionPoints: current.tacticalState.maxActionPoints,
+        phase: 'command',
+        lastEvent: `Turn ${current.tacticalState.turn + 1} started`,
+      },
+    }));
+    setTacticalNotice('Nuovo turno attivo: action points ripristinati.');
+  }
+
+  function handleHintAction() {
+    if (boardState.tacticalState.actionPoints <= 0) {
+      setTacticalNotice('Nessun action point disponibile per usare altri hint.');
+      return false;
+    }
+
+    setBoardState((current) => ({
+      ...current,
+      tacticalState: {
+        ...current.tacticalState,
+        actionPoints: Math.max(0, current.tacticalState.actionPoints - 1),
+        lastEvent: 'Intel requested',
+        phase: 'engage',
+      },
+    }));
+
+    return true;
   }
 
   function handleResetBoard() {
@@ -168,20 +287,39 @@ export default function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell" id="app-main">
+      <a className="skip-link" href="#learning-workspace">
+        Salta al workspace
+      </a>
       {floatingXp ? <FloatingXpToast xp={floatingXp.xp} questTitle={floatingXp.questTitle} /> : null}
       {levelUpLevel ? <LevelUpModal level={levelUpLevel} onClose={() => setLevelUpLevel(null)} /> : null}
 
       <QuestHud profile={boardState.profile} quests={filteredQuests} />
+      <TacticalCommandPanel
+        tacticalState={boardState.tacticalState}
+        onPhaseChange={handlePhaseChange}
+        onEndTurn={handleEndTurn}
+        notice={tacticalNotice}
+      />
       <MissionLabPanel
-        quest={recommendedLearningQuest}
+        quest={activeMissionQuest}
+        nextQuest={nextMissionQuest}
         onCompleteQuest={completeQuestWithRewards}
-        sessionState={recommendedLearningQuest ? boardState.missionLabState[recommendedLearningQuest.id] : undefined}
+        sessionState={activeMissionQuest ? boardState.missionLabState[activeMissionQuest.id] : undefined}
         onSessionChange={handleMissionLabSessionChange}
         onSessionReset={handleMissionLabSessionReset}
+        progressState={activeMissionQuest ? boardState.missionLabProgress[activeMissionQuest.id] : undefined}
+        onProgressUpdate={handleMissionLabProgressUpdate}
+        onRequestHint={handleHintAction}
+        actionPointsRemaining={boardState.tacticalState.actionPoints}
+        onOpenNextQuest={() => {
+          if (nextMissionQuest) {
+            setActiveMissionQuestId(nextMissionQuest.id);
+          }
+        }}
       />
 
-      <section className="workspace-grid">
+      <section className="workspace-grid" id="learning-workspace" aria-label="Learning workspace">
         <QuestBoard
           activeCadence={activeCadence}
           onCadenceChange={setActiveCadence}
@@ -199,37 +337,111 @@ export default function App() {
         />
 
         <aside className="sidebar-stack">
-          <QuestComposer onAddQuest={handleAddQuest} />
-          <QuestTemplates onUseTemplate={handleAddQuest} />
-          <OnboardingPreview />
-          <TheorySprintPanel quest={recommendedLearningQuest} />
-          <AcademyInsightsPanel quests={boardState.quests} profile={boardState.profile} activityLog={boardState.activityLog} />
-          <AssessmentHubPanel quests={boardState.quests} profile={boardState.profile} />
-          <CertificationVaultPanel quests={boardState.quests} profile={boardState.profile} />
-          <LearningTracksPanel quests={boardState.quests} />
-          <RecentActivityPanel items={boardState.activityLog} />
-          <LeaderboardPreview profile={boardState.profile} />
-          <DataPortabilityPanel exportPayload={exportBoardState(boardState)} onImport={handleImport} />
-
-          <PanelCard className="notes-panel">
+          <PanelCard className="sidebar-shell">
             <SectionHeading
-              eyebrow="MVP Scope"
-              title="Cosa c'e gia"
-              description="Mattoni già pronti per un'evoluzione verso prodotto reale e non solo demo."
+              eyebrow="Navigation"
+              title="Percorso utente"
+              description="Tre sezioni chiare per iniziare, monitorare i progressi e gestire il workspace."
             />
 
-            <ul>
-              <li>Persistenza locale nel browser con seed iniziale.</li>
-              <li>Quest giornaliere, settimanali e backlog con focus e priorita.</li>
-              <li>XP, livello e metriche sulla vista attiva.</li>
-              <li>Template rapidi e import/export JSON della board.</li>
-              <li>Base pronta per auth, backend e dashboard reali.</li>
-            </ul>
-
-            <ActionButton type="button" variant="secondary" onClick={handleResetBoard}>
-              Ripristina board iniziale
-            </ActionButton>
+            <div className="sidebar-switcher" role="tablist" aria-label="Sezioni laterali">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={sidebarView === 'learn'}
+                className={sidebarView === 'learn' ? 'active' : ''}
+                onClick={() => setSidebarView('learn')}
+              >
+                Inizia
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={sidebarView === 'progress'}
+                className={sidebarView === 'progress' ? 'active' : ''}
+                onClick={() => setSidebarView('progress')}
+              >
+                Progresso
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={sidebarView === 'tools'}
+                className={sidebarView === 'tools' ? 'active' : ''}
+                onClick={() => setSidebarView('tools')}
+              >
+                Strumenti
+              </button>
+            </div>
           </PanelCard>
+
+          {sidebarView === 'learn' ? (
+            <>
+              <PanelCard className="notes-panel">
+                <SectionHeading
+                  eyebrow="Recommended"
+                  title="Fai questo adesso"
+                  description="Il percorso piu semplice per avanzare nella sessione corrente."
+                />
+
+                <div className="onboarding-steps">
+                  <div className="onboarding-step">
+                    <span className="step-index">1</span>
+                    <div>
+                      <strong>Leggi la missione consigliata</strong>
+                      <small>{recommendedLearningQuest ? recommendedLearningQuest.title : 'Apri o crea una missione di apprendimento.'}</small>
+                    </div>
+                  </div>
+                  <div className="onboarding-step">
+                    <span className="step-index">2</span>
+                    <div>
+                      <strong>Completa il Mission Lab</strong>
+                      <small>Chiudi tutti gli obiettivi prima di passare a un altro pannello.</small>
+                    </div>
+                  </div>
+                </div>
+              </PanelCard>
+              <OnboardingPreview />
+              <TheorySprintPanel quest={recommendedLearningQuest} />
+              <LearningTracksPanel quests={boardState.quests} />
+            </>
+          ) : null}
+
+          {sidebarView === 'progress' ? (
+            <>
+              <AcademyInsightsPanel quests={boardState.quests} profile={boardState.profile} activityLog={boardState.activityLog} />
+              <AssessmentHubPanel quests={boardState.quests} profile={boardState.profile} />
+              <CertificationVaultPanel quests={boardState.quests} profile={boardState.profile} />
+              <RecentActivityPanel items={boardState.activityLog} />
+              <LeaderboardPreview profile={boardState.profile} />
+            </>
+          ) : null}
+
+          {sidebarView === 'tools' ? (
+            <>
+              <QuestComposer onAddQuest={handleAddQuest} />
+              <QuestTemplates onUseTemplate={handleAddQuest} />
+              <DataPortabilityPanel exportPayload={exportBoardState(boardState)} onImport={handleImport} />
+
+              <PanelCard className="notes-panel">
+                <SectionHeading
+                  eyebrow="Workspace"
+                  title="Gestione prodotto"
+                  description="Azioni di supporto separate dal percorso di apprendimento principale."
+                />
+
+                <ul>
+                  <li>Persistenza locale nel browser con ripresa del lab per missione.</li>
+                  <li>Template rapidi e import/export JSON della board.</li>
+                  <li>Base pronta per auth, backend e dashboard reali.</li>
+                </ul>
+
+                <ActionButton type="button" variant="secondary" onClick={handleResetBoard}>
+                  Ripristina board iniziale
+                </ActionButton>
+              </PanelCard>
+            </>
+          ) : null}
         </aside>
       </section>
     </main>

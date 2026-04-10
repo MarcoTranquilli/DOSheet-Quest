@@ -4,6 +4,7 @@ export type QuestFocus = 'build' | 'ops' | 'admin' | 'learning' | 'personal';
 export type QuestPriority = 'now' | 'next' | 'later';
 export type SpreadsheetPlatform = 'excel' | 'sheets' | 'both';
 export type SpreadsheetDomain = 'foundations' | 'formulas' | 'analysis' | 'visualization' | 'automation';
+export type TacticalPhase = 'command' | 'engage' | 'review';
 
 export interface QuestItem {
   id: string;
@@ -48,9 +49,28 @@ export interface MissionLabSessionState {
   elapsedSeconds: number;
 }
 
+export interface MissionLabProgressState {
+  attempts: number;
+  bestMasteryScore: number;
+  completedRuns: number;
+  completedWithoutHints: boolean;
+  lastCompletedAt?: string;
+}
+
+export interface TacticalState {
+  turn: number;
+  phase: TacticalPhase;
+  actionPoints: number;
+  maxActionPoints: number;
+  momentum: number;
+  lastEvent: string;
+}
+
 export interface QuestBoardState {
   quests: QuestItem[];
   profile: QuestProfile;
   activityLog: QuestActivityEntry[];
   missionLabState: Record<string, MissionLabSessionState>;
+  missionLabProgress: Record<string, MissionLabProgressState>;
+  tacticalState: TacticalState;
 }

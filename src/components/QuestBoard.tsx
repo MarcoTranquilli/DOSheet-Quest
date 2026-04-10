@@ -45,7 +45,7 @@ export function QuestBoard({
         <SectionHeading
           eyebrow="Mission Sheet"
           title="Vista operativa delle quest"
-          description="Ordina il lavoro per cadenza, priorita e focus con una board leggibile e rapida da aggiornare."
+          description="Scegli la missione giusta, filtra il lavoro aperto e aggiorna la board con pochi passaggi."
         />
 
         <div className="tabs" aria-label="Filtro cadenza">
@@ -108,7 +108,7 @@ export function QuestBoard({
           <div className="board-spotlight-side">
             <span className={`pill ${spotlightQuest.difficulty}`}>{spotlightQuest.difficulty}</span>
             <strong>{spotlightQuest.xp} XP</strong>
-            <small>{spotlightQuest.practiceHint || 'Riproduci l’esercizio in un foglio reale e verifica che il risultato sia coerente.'}</small>
+            <small>{spotlightQuest.practiceHint || 'Riproduci l’esercizio in un foglio reale e verifica il risultato.'}</small>
           </div>
         </div>
       ) : null}
@@ -119,7 +119,7 @@ export function QuestBoard({
           <input
             value={searchQuery}
             onChange={(event) => onSearchQueryChange(event.target.value)}
-            placeholder="Titolo o nota"
+            placeholder="Cerca una missione"
           />
         </label>
 
@@ -163,9 +163,9 @@ export function QuestBoard({
       <div className="board-table" role="table" aria-label="Lista quest">
         <div className="table-head" role="row">
           <span>Done</span>
-          <span>Quest</span>
+          <span>Missione</span>
           <span>Focus</span>
-          <span>Priority</span>
+          <span>Priorita</span>
           <span>Tier</span>
           <span>XP</span>
         </div>

@@ -19,6 +19,18 @@ export function canonicalizeFormula(value: string) {
   return value.replace(/\s+/g, '').replace(/;/g, ',').toUpperCase();
 }
 
+function extractFormulaFunction(formula: string) {
+  const normalized = canonicalizeFormula(formula);
+  const match = normalized.match(/^=([A-Z.]+)\(/);
+  return match ? match[1] : null;
+}
+
+function extractCellReferences(formula: string) {
+  const normalized = canonicalizeFormula(formula);
+  const matches = normalized.match(/[A-Z]+\d+(?::[A-Z]+\d+)?/g);
+  return matches ?? ([] as string[]);
+}
+
 function parseScalarToken(token: string, cells: CellMap, visited: Set<string>) {
   const normalized = token.trim().toUpperCase();
 
@@ -185,4 +197,100 @@ export function matchesObjective(objective: MissionLabObjective, cells: CellMap)
   }
 
   return false;
+}
+
+export function getObjectiveFeedback(objective: MissionLabObjective, cells: CellMap) {
+  const value = cells[objective.cellId] ?? '';
+
+  if (matchesObjective(objective, cells)) {
+    return {
+      state: 'complete' as const,
+      category: 'correct' as const,
+      label: 'Completato',
+      message: 'Questo passaggio è corretto. Puoi continuare con lo step successivo.',
+    };
+  }
+
+  if (!value.trim()) {
+    return {
+      state: 'empty' as const,
+      category: 'missing-input' as const,
+      label: 'Da iniziare',
+      message: objective.expectedFormula
+        ? `Inserisci una formula in ${objective.cellId} per completare questo step.`
+        : `Inserisci il valore corretto in ${objective.cellId} per completare questo step.`,
+    };
+  }
+
+  if (objective.expectedFormula) {
+    if (!value.trim().startsWith('=')) {
+      return {
+        state: 'warning' as const,
+        category: 'missing-formula' as const,
+        label: 'Formula mancante',
+        message: `Qui serve una formula, non solo un valore statico. Parti con "=" e costruisci la logica richiesta.`,
+      };
+    }
+
+    const expectedFunction = extractFormulaFunction(objective.expectedFormula);
+    const actualFunction = extractFormulaFunction(value);
+    if (expectedFunction && actualFunction && expectedFunction !== actualFunction) {
+      return {
+        state: 'warning' as const,
+        category: 'wrong-function' as const,
+        label: 'Funzione sbagliata',
+        message: `La formula usa ${actualFunction}, ma qui stiamo allenando ${expectedFunction}. Rivedi la funzione principale.`,
+      };
+    }
+
+    const expectedRefs = extractCellReferences(objective.expectedFormula);
+    const actualRefs = extractCellReferences(value);
+    if (
+      expectedRefs.length > 0 &&
+      actualRefs.length > 0 &&
+      expectedRefs.some((reference) => !actualRefs.includes(reference))
+    ) {
+      return {
+        state: 'warning' as const,
+        category: 'wrong-reference' as const,
+        label: 'Range o riferimento errato',
+        message: 'La logica è vicina, ma uno o più riferimenti non puntano alle celle corrette. Controlla range, chiavi e colonne di ritorno.',
+      };
+    }
+
+    const expectedResult = evaluateCellFormula('__expected__', { ...cells, __expected__: objective.expectedFormula });
+    const actualResult = evaluateCellFormula(objective.cellId, cells);
+
+    if (actualResult === expectedResult) {
+      return {
+        state: 'warning' as const,
+        category: 'right-result-wrong-structure' as const,
+        label: 'Risultato corretto',
+        message: 'Il risultato finale torna, ma qui stiamo allenando una formula specifica. Rivedi struttura, range e funzione usata.',
+      };
+    }
+
+    if (actualResult === '#N/A' || actualResult === '#VALUE!' || actualResult === '#DIV/0!' || actualResult === '#LOOP!') {
+      return {
+        state: 'warning' as const,
+        category: 'formula-error' as const,
+        label: 'Errore di formula',
+        message: `La formula restituisce ${actualResult}. Controlla sintassi, riferimenti e ordine degli argomenti.`,
+      };
+    }
+
+    return {
+      state: 'warning' as const,
+      category: 'wrong-output' as const,
+      label: 'Da correggere',
+      message: objective.hintPrimary,
+    };
+  }
+
+  return {
+    state: 'warning' as const,
+    category: 'wrong-value' as const,
+    label: 'Da correggere',
+    message: objective.hintPrimary,
+  };
 }

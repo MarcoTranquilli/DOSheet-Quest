@@ -31,13 +31,13 @@ export function LeaderboardPreview({ profile }: LeaderboardPreviewProps) {
     <PanelCard className="notes-panel">
       <SectionHeading
         eyebrow="Learning Cohort"
-        title="Leaderboard preview"
-        description="Classifica dal tono collaborativo, utile a mostrare avanzamento, continuita e confronto sano tra pari."
+        title="Progressi del gruppo"
+        description="Una vista leggera sul confronto tra pari, utile per motivare senza distrarre dal percorso principale."
       />
 
       <div className="leaderboard-banner">
-        <strong>Confronto utile, non tossico</strong>
-        <small>Il ranking premia costanza e progressione, non acquisti o vantaggi artificiali.</small>
+        <strong>Usa la classifica come riferimento, non come pressione</strong>
+        <small>La priorita resta completare missioni bene e con continuita.</small>
       </div>
 
       <div className="leaderboard-list">
